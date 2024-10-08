@@ -1,0 +1,82 @@
+
+OCHA@DESKTOP-39C75D8 MINGW64 C:/Users/OCHA/AppData/Local/Programs/Microsoft VS Code
+$ ~/Documents/Boothcamp/DE7
+bash: C:\Users\OCHA/Documents/Boothcamp/DE7: Is a directory
+
+OCHA@DESKTOP-39C75D8 MINGW64 C:/Users/OCHA/AppData/Local/Programs/Microsoft VS Code
+$ cd C:\Users\OCHA\Documents\Boothcamp
+bash: cd: C:UsersOCHADocumentsBoothcamp: No such file or directory
+
+OCHA@DESKTOP-39C75D8 MINGW64 C:/Users/OCHA/AppData/Local/Programs/Microsoft VS Code
+$ cd C:/Users/OCHA/Documents/Boothcamp
+
+OCHA@DESKTOP-39C75D8 MINGW64 /c/Users/OCHA/Documents/Boothcamp
+$ cd DE7
+
+OCHA@DESKTOP-39C75D8 MINGW64 /c/Users/OCHA/Documents/Boothcamp/DE7
+$ rm Project_ETL
+rm: cannot remove 'Project_ETL': No such file or directory
+
+OCHA@DESKTOP-39C75D8 MINGW64 /c/Users/OCHA/Documents/Boothcamp/DE7
+$ mkdir Project_ETL
+
+OCHA@DESKTOP-39C75D8 MINGW64 /c/Users/OCHA/Documents/Boothcamp/DE7
+$ cd Project_ETL
+
+OCHA@DESKTOP-39C75D8 MINGW64 /c/Users/OCHA/Documents/Boothcamp/DE7/Project_ETL
+$ git init
+Initialized empty Git repository in C:/Users/OCHA/Documents/Boothcamp/DE7/Project_ETL/.git/
+
+OCHA@DESKTOP-39C75D8 MINGW64 /c/Users/OCHA/Documents/Boothcamp/DE7/Project_ETL (master)
+$ cd .git
+
+OCHA@DESKTOP-39C75D8 MINGW64 /c/Users/OCHA/Documents/Boothcamp/DE7/Project_ETL/.git (GIT_DIR!)
+$ cd .
+
+OCHA@DESKTOP-39C75D8 MINGW64 /c/Users/OCHA/Documents/Boothcamp/DE7/Project_ETL/.git (GIT_DIR!)
+$ cd ..
+
+OCHA@DESKTOP-39C75D8 MINGW64 /c/Users/OCHA/Documents/Boothcamp/DE7/Project_ETL (master)
+$ git config user.name rosalinathuffi
+
+OCHA@DESKTOP-39C75D8 MINGW64 /c/Users/OCHA/Documents/Boothcamp/DE7/Project_ETL (master)
+$ git config user.email ochathuffi@gmail.com
+
+OCHA@DESKTOP-39C75D8 MINGW64 /c/Users/OCHA/Documents/Boothcamp/DE7/Project_ETL (master)
+$ cat .git/config
+[core]
+        repositoryformatversion = 0
+        filemode = false
+        bare = false
+        logallrefupdates = true
+        symlinks = false
+        ignorecase = true
+[user]
+        name = rosalinathuffi
+        email = ochathuffi@gmail.com
+
+OCHA@DESKTOP-39C75D8 MINGW64 /c/Users/OCHA/Documents/Boothcamp/DE7/Project_ETL (master)
+$ git status
+On branch master
+
+No commits yet
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+ect_ETL (master)
+$ git add Readme.md
+
+OCHA@DESKTOP-39C75D8 MINGW64 /c/Users/OCHA/Documents/Boothcamp/DE7/Project_ETL (master)
+$ git commit -m "Add README file"
+[master (root-commit) 09c099d] Add README file
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+ create mode 100644 Readme.md
+
+OCHA@DESKTOP-39C75D8 MINGW64 /c/Users/OCHA/Documents/Boothcamp/DE7/Project_ETL (master)
+$ mkdir script_extrac_data
+
+OCHA@DESKTOP-39C75D8 MINGW64 /c/Users/OCHA/Documents/Boothcamp/DE7/Project_ETL (master)
+$ cd script_extrac_data
+
+OCHA@DESKTOP-39C75D8 MINGW64 /c/Users/OCHA/Documents/Boothcamp/DE7/Project_ETL/script_extrac_data (master)
+$
