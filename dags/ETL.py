@@ -4,11 +4,13 @@ from airflow.utils.dates import days_ago
 import pandas as pd
 import sqlite3
 import sys
+import os
 from sqlalchemy import create_engine
 
-# Untuk membaca file perintah extract filenya
+# Menambahkan path ke direktori tasks
 sys.path.insert(0, 'C:\\Users\\OCHA\\Documents\\Boothcamp\\DE7\\Project_ETL\\airflow\\tasks')
-from tasks.extraction_web import extract_data  
+# Mengimpor fungsi extract_data
+from extraction_web import extract_data
 
 
 # Definisi DAG
