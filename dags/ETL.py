@@ -8,10 +8,10 @@ import os
 from sqlalchemy import create_engine
 
 # Menambahkan path ke direktori tasks
-sys.path.insert(0, 'C:\\Users\\OCHA\\Documents\\Boothcamp\\DE7\\Project_ETL\\airflow\\tasks')
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../tasks'))
+
 # Mengimpor fungsi extract_data
 from extraction_web import extract_data
-
 
 # Definisi DAG
 @dag(
@@ -21,7 +21,6 @@ from extraction_web import extract_data
     catchup=False,
 )
 def ETL():
-
     # Task untuk ekstraksi
     @task
     def extract_task(**kwargs):
@@ -33,7 +32,7 @@ def ETL():
     def load_data_to_sqlite(parquet_file='data/news_data.parquet', db_name='news.db'):
         # Membaca data dari file Parquet
         df = pd.read_parquet(parquet_file)
-        
+
         # Buat koneksi ke SQLite
         engine = create_engine(f"sqlite:///{db_name}")
         connection = engine.connect()
@@ -41,7 +40,7 @@ def ETL():
         # Buat tabel untuk menampung data
         with connection.begin() as conn:
             conn.execute('DROP TABLE IF EXISTS news')
-            conn.execute('''
+            conn.execute(''' 
                 CREATE TABLE news(
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     title TEXT NOT NULL,
