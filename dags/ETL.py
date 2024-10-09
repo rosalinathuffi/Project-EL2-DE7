@@ -8,7 +8,8 @@ from sqlalchemy import create_engine
 
 # Untuk membaca file perintah extract filenya
 sys.path.insert(0, 'C:\\Users\\OCHA\\Documents\\Boothcamp\\DE7\\Project_ETL\\airflow\\tasks')
-from extract_web import extract_data  
+from tasks.extraction_web import extract_data  
+
 
 # Definisi DAG
 @dag(
