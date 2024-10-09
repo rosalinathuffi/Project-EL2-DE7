@@ -11,7 +11,7 @@ from sqlalchemy import create_engine
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../tasks'))
 
 # Mengimpor fungsi extract_data
-from extraction_web import extract_data
+from tasks.extraction_web import extract_data
 
 # Definisi DAG
 @dag(
