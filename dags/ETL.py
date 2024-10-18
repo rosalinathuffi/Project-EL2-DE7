@@ -1,66 +1,72 @@
-from airflow.decorators import dag, task
-from airflow.operators.dummy import DummyOperator
-from airflow.utils.dates import days_ago
-import pandas as pd
-import sqlite3
-import sys
+from airflow.decorators import task, dag
+from airflow.operators.empty import EmptyOperator
+from airflow.operators.python import PythonOperator
+from airflow.utils.trigger_rule import TriggerRule
+from datetime import datetime
 import os
+import pandas as pd
 from sqlalchemy import create_engine
 
-# Menambahkan path ke direktori tasks
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../tasks'))
+# Impor fungsi dari file eksternal
+from extraction_web import extract_data as extract_web  # Ekstraksi dari Detik
+from extraction_kompas import extract_data as extract_kompas  # Ekstraksi dari Kompas
 
-# Mengimpor fungsi extract_data
-from tasks.extraction_web import extract_data
-
-# Definisi DAG
 @dag(
-    description='Extract data from Detik.com and load into SQLite',
-    schedule_interval=None,
-    start_date=days_ago(1),
+    dag_id='etl_assignment',
+    description='ETL assignment with external extraction tasks.',
+    schedule_interval="@daily",
+    start_date=datetime(2024, 9, 29),
     catchup=False,
+    params={
+        "source": "all",  # Ambil dari semua sumber
+        "extension": "parquet"  # Format penyimpanan
+    }
 )
-def ETL():
+def etl_process():
+    
+    start = EmptyOperator(task_id='start')
+    end = EmptyOperator(task_id='end', trigger_rule=TriggerRule.ONE_SUCCESS)
+    
+    def cleanup():
+        os.system("rm -rf dags/data/staging/*")
+        print("Staging folder cleaned up")
+    
+    cleanup_task = PythonOperator(
+        task_id='cleanup',
+        python_callable=cleanup
+    )
+    
+    @task
+    def extract_kompas_task():
+        extract_kompas(parquet_file='dags/data/staging/kompas.parquet')
+
+    @task
+    def extract_web_task():
+        extract_web(parquet_file='dags/data/staging/web.parquet')
+
+    # Task untuk Load ke SQLite
+    @task
+    def load_to_sqlite():
+        # Memuat data dari Kompas
+        kompas_file_path = 'dags/data/staging/kompas.parquet'
+        kompas_engine = create_engine('sqlite:///dags/data/db_output/kompas.db')
+        kompas_df = pd.read_parquet(kompas_file_path)
+        kompas_df.to_sql('kompas_news', kompas_engine, if_exists='replace', index=False)
+        print(f"Data loaded to SQLite from {kompas_file_path}")
+
+        # Memuat data dari Detik
+        detik_file_path = 'dags/data/staging/web.parquet'
+        detik_engine = create_engine('sqlite:///dags/data/db_output/detik.db')
+        detik_df = pd.read_parquet(detik_file_path)
+        detik_df.to_sql('detik_news', detik_engine, if_exists='replace', index=False)
+        print(f"Data loaded to SQLite from {detik_file_path}")
+
     # Task untuk ekstraksi
-    @task
-    def extract_task(**kwargs):
-        # Memanggil fungsi extract_data dari extract_web.py
-        extract_data()
+    extract_kompas = extract_kompas_task()
+    extract_web = extract_web_task()
+    load_to_sqlite_task = load_to_sqlite()
 
-    # Task untuk memuat data ke SQLite
-    @task
-    def load_data_to_sqlite(parquet_file='data/news_data.parquet', db_name='news.db'):
-        # Membaca data dari file Parquet
-        df = pd.read_parquet(parquet_file)
+    # Rangkaian task dalam DAG
+    start >> [extract_kompas, extract_web] >> load_to_sqlite_task >> cleanup_task >> end
 
-        # Buat koneksi ke SQLite
-        engine = create_engine(f"sqlite:///{db_name}")
-        connection = engine.connect()
-
-        # Buat tabel untuk menampung data
-        with connection.begin() as conn:
-            conn.execute('DROP TABLE IF EXISTS news')
-            conn.execute(''' 
-                CREATE TABLE news(
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    title TEXT NOT NULL,
-                    link TEXT NOT NULL,
-                    date_news DATETIME NOT NULL
-                )
-            ''')
-
-            # Memasukkan data ke dalam tabel
-            df.to_sql('news', con=conn, if_exists='append', index=False)
-
-    # Dummy task untuk menandai awal DAG
-    start_task = DummyOperator(task_id='start')
-
-    # Menjalankan ekstraksi dan load ke SQLite
-    extract = extract_task()
-    load = load_data_to_sqlite()
-
-    # Definisikan urutan task
-    start_task >> extract >> load
-
-# Inisialisasi DAG
-dag_instance = ETL()
+etl_process()
