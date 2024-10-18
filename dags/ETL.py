@@ -8,11 +8,11 @@ import pandas as pd
 from sqlalchemy import create_engine
 
 # Impor fungsi dari file eksternal
-from extraction_web import extract_data as extract_web  # Ekstraksi dari Detik
-from extraction_kompas import extract_data as extract_kompas  # Ekstraksi dari Kompas
+from tasks.extraction_web import extract_data as extract_web
+from tasks.extraction_kompas import extract_data as extract_kompas  # Ekstraksi dari Kompas
 
 @dag(
-    dag_id='etl_assignment',
+    dag_id='ETL',
     description='ETL assignment with external extraction tasks.',
     schedule_interval="@daily",
     start_date=datetime(2024, 9, 29),
