@@ -1,7 +1,7 @@
-from airflow.decorators import task, dag
-from airflow.operators.empty import EmptyOperator
-from airflow.operators.python import PythonOperator
-from airflow.utils.trigger_rule import TriggerRule
+from airflow.decorators import task, dag # type: ignore
+from airflow.operators.empty import EmptyOperator # type: ignore
+from airflow.operators.python import PythonOperator # type: ignore
+from airflow.utils.trigger_rule import TriggerRule # type: ignore
 from datetime import datetime
 import os
 import pandas as pd
