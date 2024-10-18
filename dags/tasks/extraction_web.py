@@ -37,8 +37,9 @@ def extract_data(parquet_file='data/news_data.parquet'):
 
         # Membuat DataFrame dan menyimpan sebagai Parquet
         df = pd.DataFrame(news_data)
-        df.to_parquet(parquet_file, index=False)  # Simpan data ke dalam format Parquet
+        df.to_parquet(parquet_file, index=False)
 
         print(f'Data saved to SQLite and Parquet file: {parquet_file}')
     else:
         print('Error:', response.status_code)
+
