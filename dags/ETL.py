@@ -26,10 +26,20 @@ def etl_process():
     
     start = EmptyOperator(task_id='start')
     end = EmptyOperator(task_id='end', trigger_rule=TriggerRule.ONE_SUCCESS)
+
+    def create_directories():
+        os.makedirs('dags/data/staging', exist_ok=True)
+        os.makedirs('dags/data/db_output', exist_ok=True)
+        print("Directories ensured")
     
     def cleanup():
         os.system("rm -rf dags/data/staging/*")
         print("Staging folder cleaned up")
+    
+    create_directories_task = PythonOperator(
+        task_id='create_directories',
+        python_callable=create_directories
+    )
     
     cleanup_task = PythonOperator(
         task_id='cleanup',
@@ -38,24 +48,24 @@ def etl_process():
     
     @task
     def extract_kompas_task():
-        extract_kompas(parquet_file='dags/data/staging/kompas.parquet')
+        extract_kompas(parquet_file='dags/data/staging/news_kompas.parquet')
 
     @task
     def extract_web_task():
-        extract_web(parquet_file='dags/data/staging/web.parquet')
+        extract_web(parquet_file='dags/data/staging/news_data.parquet')
 
     # Task untuk Load ke SQLite
     @task
     def load_to_sqlite():
         # Memuat data dari Kompas
-        kompas_file_path = 'dags/data/staging/kompas.parquet'
+        kompas_file_path = 'dags/data/staging/news_kompas.parquet'
         kompas_engine = create_engine('sqlite:///dags/data/db_output/kompas.db')
         kompas_df = pd.read_parquet(kompas_file_path)
         kompas_df.to_sql('kompas_news', kompas_engine, if_exists='replace', index=False)
         print(f"Data loaded to SQLite from {kompas_file_path}")
 
         # Memuat data dari Detik
-        detik_file_path = 'dags/data/staging/web.parquet'
+        detik_file_path = 'dags/data/staging/news_data.parquet'
         detik_engine = create_engine('sqlite:///dags/data/db_output/detik.db')
         detik_df = pd.read_parquet(detik_file_path)
         detik_df.to_sql('detik_news', detik_engine, if_exists='replace', index=False)

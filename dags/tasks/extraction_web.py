@@ -4,7 +4,7 @@ import pandas as pd
 from datetime import datetime
 import urllib.request
 
-def extract_data(parquet_file='data/news_data.parquet'):
+def extract_data(parquet_file='/opt/airflow/dags/data/staging/news_data.parquet'):
     #Mengambil halaman berita populer
     url='https://www.detik.com/terpopuler'
     response = requests.get(url)

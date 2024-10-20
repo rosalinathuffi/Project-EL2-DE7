@@ -4,7 +4,7 @@ import pandas as pd
 from datetime import datetime
 import urllib.request
 
-def extract_data(parquet_file='data/news_kompas.parquet'):
+def extract_data(parquet_file='/opt/airflow/dags/data/staging/kompas.parquet'):
     #Mengambil halaman berita populer
     url='https://www.kompas.com/'
     response = requests.get(url)
@@ -47,5 +47,3 @@ def extract_data(parquet_file='data/news_kompas.parquet'):
     else:
         print('Error:', response.status_code)
 
-# Menjalankan fungsi
-extract_data()
