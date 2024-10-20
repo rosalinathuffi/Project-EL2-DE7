@@ -6,10 +6,11 @@ from datetime import datetime
 import os
 import pandas as pd
 from sqlalchemy import create_engine
+import time 
 
 # Impor fungsi dari file eksternal
-from tasks.extraction_web import extract_data as extract_web
-from tasks.extraction_kompas import extract_data as extract_kompas  # Ekstraksi dari Kompas
+from tasks.extraction_web import extract_data as extract_web_func
+from tasks.extraction_kompas import extract_data as extract_kompas_func  # Ekstraksi dari Kompas
 
 @dag(
     dag_id='ETL',
@@ -33,8 +34,12 @@ def etl_process():
         print("Directories ensured")
     
     def cleanup():
-        os.system("rm -rf dags/data/staging/*")
-        print("Staging folder cleaned up")
+        now = time.time()
+        for filename in os.listdir('dags/data/staging'):
+            file_path = os.path.join('dags/data/staging', filename)
+            if os.stat(file_path).st_mtime < now - 30 * 86400:  # Simpan untuk 30 hari saja
+                os.remove(file_path)
+                print(f"Deleted old file: {file_path}")
     
     create_directories_task = PythonOperator(
         task_id='create_directories',
@@ -42,31 +47,31 @@ def etl_process():
     )
     
     cleanup_task = PythonOperator(
-        task_id='cleanup',
+        task_id='cleanup_task',
         python_callable=cleanup
     )
     
     @task
     def extract_kompas_task():
-        extract_kompas(parquet_file='dags/data/staging/news_kompas.parquet')
+        return extract_kompas_func(parquet_file='dags/data/staging/news_kompas.parquet')
 
     @task
     def extract_web_task():
-        extract_web(parquet_file='dags/data/staging/news_data.parquet')
+        return extract_web_func(parquet_file='dags/data/staging/news_data.parquet')
 
     # Task untuk Load ke SQLite
     @task
     def load_to_sqlite():
-        # Memuat data dari Kompas
-        kompas_file_path = 'dags/data/staging/news_kompas.parquet'
-        kompas_engine = create_engine('sqlite:///dags/data/db_output/kompas.db')
+        # Load data from Kompas
+        kompas_file_path = '/opt/airflow/dags/data/staging/news_kompas.parquet'
+        kompas_engine = create_engine('sqlite:////opt/airflow/dags/data/db_output/kompas.db')  # Use absolute path
         kompas_df = pd.read_parquet(kompas_file_path)
         kompas_df.to_sql('kompas_news', kompas_engine, if_exists='replace', index=False)
         print(f"Data loaded to SQLite from {kompas_file_path}")
 
-        # Memuat data dari Detik
-        detik_file_path = 'dags/data/staging/news_data.parquet'
-        detik_engine = create_engine('sqlite:///dags/data/db_output/detik.db')
+        # Load data from Detik
+        detik_file_path = '/opt/airflow/dags/data/staging/news_data.parquet'
+        detik_engine = create_engine('sqlite:////opt/airflow/dags/data/db_output/detik.db')  # Use absolute path
         detik_df = pd.read_parquet(detik_file_path)
         detik_df.to_sql('detik_news', detik_engine, if_exists='replace', index=False)
         print(f"Data loaded to SQLite from {detik_file_path}")
@@ -77,6 +82,6 @@ def etl_process():
     load_to_sqlite_task = load_to_sqlite()
 
     # Rangkaian task dalam DAG
-    start >> [extract_kompas, extract_web] >> load_to_sqlite_task >> cleanup_task >> end
+    start >> create_directories_task >> [extract_kompas, extract_web] >> load_to_sqlite_task >> cleanup_task >> end
 
 etl_process()
