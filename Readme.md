@@ -16,4 +16,7 @@ Visualisasi param DAG
 <img width="524" alt="Param DAG" src="https://github.com/user-attachments/assets/d22ab52e-bffd-4876-9974-a168d87d972c">
 
 
+Visualisasi folder dan hasil ELT
+
+<img width="148" alt="folder DAG dan hasil output" src="https://github.com/user-attachments/assets/e0c2c4ce-d76b-4dfc-8385-0b24f50c9a3d">
 
